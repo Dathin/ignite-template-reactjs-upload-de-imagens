@@ -5,10 +5,24 @@ import { useInfiniteQuery } from 'react-query';
 import { Header } from '../components/Header';
 import { CardList } from '../components/CardList';
 import { api } from '../services/api';
-import { Loading } from '../components/Loading';
-import { Error } from '../components/Error';
+import { LoadData } from '../components/LoadData';
+
+interface ImagesResponse {
+  data: {
+    title: string;
+    description: string;
+    url: string;
+    ts: number;
+    id: string;
+  }[];
+  after: string;
+}
 
 export default function Home(): JSX.Element {
+  async function fetchImages({ pageParam = 0 }): Promise<ImagesResponse> {
+    const { data } = await api.get<ImagesResponse>(`images?after=${pageParam}`);
+    return data;
+  }
   const {
     data,
     isLoading,
@@ -16,29 +30,29 @@ export default function Home(): JSX.Element {
     isFetchingNextPage,
     fetchNextPage,
     hasNextPage,
-  } = useInfiniteQuery(
-    'images',
-    // TODO AXIOS REQUEST WITH PARAM
-    ,
-    // TODO GET AND RETURN NEXT PAGE PARAM
+  } = useInfiniteQuery('images', fetchImages, {
+    getNextPageParam: res => res.after,
+  });
+
+  const formattedData = useMemo(
+    () => data?.pages.flatMap(({ data: pageData }) => pageData),
+    [data]
   );
-
-  const formattedData = useMemo(() => {
-    // TODO FORMAT AND FLAT DATA ARRAY
-  }, [data]);
-
-  // TODO RENDER LOADING SCREEN
-
-  // TODO RENDER ERROR SCREEN
 
   return (
     <>
       <Header />
-
-      <Box maxW={1120} px={20} mx="auto" my={20}>
-        <CardList cards={formattedData} />
-        {/* TODO RENDER LOAD MORE BUTTON IF DATA HAS NEXT PAGE */}
-      </Box>
+      <LoadData isLoading={isLoading} isError={isError}>
+        <Box maxW={1120} px={20} mx="auto" my={20}>
+          <CardList cards={formattedData} />
+          {hasNextPage && `hoje tem`}
+          {hasNextPage && (
+            <Button onClick={() => fetchNextPage()}>
+              {isFetchingNextPage ? `Carregando...` : `Carregar mais`}
+            </Button>
+          )}
+        </Box>
+      </LoadData>
     </>
   );
 }
