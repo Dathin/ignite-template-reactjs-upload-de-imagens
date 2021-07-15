@@ -28,13 +28,17 @@ export function ModalViewImage({
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered size="4xl">
       <ModalOverlay />
-      <ModalContent bgColor="pGray.900" w="900px" height="900px">
+      <ModalContent bgColor="pGray.900" w="900px" height="600px">
         <ModalBody>
           <Stack maxW="900px" maxH="600px ">
-            <Image src={imgUrl} layout="fill" objectFit="scale-down" />
+            <Image src={imgUrl} layout="fill" objectFit="contain" />
           </Stack>
         </ModalBody>
-        <ModalFooter justifyContent="left" zIndex="1">
+        <ModalFooter
+          justifyContent="left"
+          zIndex="1"
+          backgroundColor="gray.800"
+        >
           <Link
             fontSize="14px"
             lineHeight="16px"
