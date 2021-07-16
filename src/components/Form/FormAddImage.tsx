@@ -51,7 +51,7 @@ export function FormAddImage({ closeModal }: FormAddImageProps): JSX.Element {
       title: string;
       description: string;
     }) =>
-      api.post('images', {
+      api.post('/api/images', {
         url,
         title,
         description,
